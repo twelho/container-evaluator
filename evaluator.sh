@@ -44,6 +44,9 @@ cmd whoami
 cmd id
 
 hline
+cmd sysctl user
+
+hline
 cmd cat /etc/subuid
 cmd cat /etc/subgid
 
@@ -57,3 +60,5 @@ if [ -n "${RUN_TESTS++}" ]; then
     # TODO: Run tests with rootless Docker
     # TODO: Rootless Podman?
 fi
+
+exit 0
