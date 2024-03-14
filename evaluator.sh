@@ -56,6 +56,9 @@ hline
 cmd cat /etc/subuid
 cmd cat /etc/subgid
 
+hline
+cmd ls /dev/kvm
+
 if [ -n "${RUN_TESTS++}" ]; then
     cd "$(mktemp -d)" || exit 1
     hline
