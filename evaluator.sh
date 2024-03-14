@@ -3,6 +3,7 @@
 
 VERSION=0.1.0
 RELEASE=$(uname -r)
+WORKDIR=/projappl/${ACCOUNT:-undefined}/container-evaluator
 
 # Print horizontal line
 hline() {
@@ -29,6 +30,10 @@ kconfig() {
 hline
 echo "Container Evaluator v$VERSION"
 date
+
+hline
+cmd mkdir -p "$WORKDIR" || exit 1
+cmd cd "$WORKDIR" || exit 1
 
 hline
 cmd uname -a
@@ -60,8 +65,8 @@ hline
 cmd ls /dev/kvm
 
 if [ -n "${RUN_TESTS++}" ]; then
-    cd "$(mktemp -d)" || exit 1
     hline
+    cmd rm -rf apptainer
     cmd 'curl -fL https://raw.githubusercontent.com/apptainer/apptainer/main/tools/install-unprivileged.sh | bash -s - apptainer'
     cmd ./apptainer/bin/apptainer run docker://sylabsio/lolcow:latest
     hline
