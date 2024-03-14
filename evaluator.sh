@@ -66,8 +66,10 @@ cmd ls /dev/kvm
 
 if [ -n "${RUN_TESTS++}" ]; then
     hline
-    cmd rm -rf apptainer
+    cmd rm -rf apptainer apptainer-tmp
     cmd 'curl -fL https://raw.githubusercontent.com/apptainer/apptainer/main/tools/install-unprivileged.sh | bash -s - apptainer'
+    export APPTAINER_TMPDIR="$WORKDIR/apptainer-tmp"
+    cmd mkdir -p "$APPTAINER_TMPDIR"
     cmd ./apptainer/bin/apptainer run docker://sylabsio/lolcow:latest
     hline
     cmd 'curl -fL https://get.docker.com/rootless | sh'
