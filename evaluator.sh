@@ -47,6 +47,9 @@ hline
 cmd ls -l /etc/sysctl.conf /etc/sysctl.d
 
 hline
+cmd cat /etc/sysctl.conf
+
+hline
 cmd sysctl user
 
 hline
@@ -57,7 +60,7 @@ if [ -n "${RUN_TESTS++}" ]; then
     cd "$(mktemp -d)" || exit 1
     hline
     cmd 'curl -fL https://raw.githubusercontent.com/apptainer/apptainer/main/tools/install-unprivileged.sh | bash -s - apptainer'
-    # TODO: Run tests with Apptainer
+    cmd ./apptainer/bin/apptainer run docker.io/library/hello-world
     hline
     cmd 'curl -fL https://get.docker.com/rootless | sh'
     # TODO: Run tests with rootless Docker
