@@ -37,7 +37,7 @@ hline
 cmd 'lscpu | head -13'
 
 hline
-cmd 'kconfig | grep -E "USER_NS|NAMESPACES"'
+cmd 'kconfig | grep -E "USER_NS|NAMESPACES|CGROUP"'
 
 hline
 cmd whoami
