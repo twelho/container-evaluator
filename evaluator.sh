@@ -63,11 +63,12 @@ if [ -n "${RUN_TESTS++}" ]; then
     cd "$(mktemp -d)" || exit 1
     hline
     cmd 'curl -fL https://raw.githubusercontent.com/apptainer/apptainer/main/tools/install-unprivileged.sh | bash -s - apptainer'
-    cmd ./apptainer/bin/apptainer run docker.io/library/hello-world
+    cmd ./apptainer/bin/apptainer run docker://sylabsio/lolcow:latest
     hline
     cmd 'curl -fL https://get.docker.com/rootless | sh'
     # TODO: Run tests with rootless Docker
     # TODO: Rootless Podman?
 fi
 
+hline
 exit 0
