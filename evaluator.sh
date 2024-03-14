@@ -44,6 +44,9 @@ cmd whoami
 cmd id
 
 hline
+cmd ls -l /etc/sysctl.conf /etc/sysctl.d
+
+hline
 cmd sysctl user
 
 hline
