@@ -58,6 +58,9 @@ hline
 cmd sysctl user
 
 hline
+cmd sysctl kernel.unprivileged_userns_clone
+
+hline
 cmd cat /etc/subuid
 cmd cat /etc/subgid
 
