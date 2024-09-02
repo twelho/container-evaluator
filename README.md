@@ -9,6 +9,13 @@ export ACCOUNT=project_123 # Enter your Slurm account here
 RUN_TESTS= ./run.sh # Set RUN_TESTS= to also run tests with container runtimes
 ```
 
+Alternatively, to just run on the login node:
+
+```shell
+export ACCOUNT=project_123 # Enter your Slurm account here (optional)
+RUN_TESTS= ./evaluator.sh # Set RUN_TESTS= to also run tests with container runtimes
+```
+
 ## Authors
 
 - Dennis Marttinen ([@twelho](https://github.com/twelho))

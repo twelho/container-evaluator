@@ -3,7 +3,13 @@
 
 VERSION=0.1.0
 RELEASE=$(uname -r)
-WORKDIR=/projappl/${ACCOUNT:-undefined}/container-evaluator
+
+WORKDIR=.
+if [ -d /projappl ] && [ -n "${ACCOUNT++}" ]; then
+    # CSC's environment detected, use a /projappl directory
+    WORKDIR="/projappl/$ACCOUNT"
+fi
+WORKDIR="$WORKDIR/container-evaluator-tmp"
 
 # Print horizontal line
 hline() {
