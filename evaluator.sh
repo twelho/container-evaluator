@@ -76,6 +76,17 @@ cmd cat /etc/subgid
 hline
 cmd ls /dev/kvm
 
+for runtime in apptainer singularity; do
+    hline
+    cmd cat /etc/"$runtime"/"$runtime".conf
+
+    hline
+    cmd cat /etc/"$runtime"/rocmliblist.conf
+
+    hline
+    cmd tail -n +1 /etc/"$runtime"/network/*
+done
+
 if [ -n "${RUN_TESTS++}" ]; then
     hline
     cmd rm -rf apptainer apptainer-tmp
@@ -85,8 +96,6 @@ if [ -n "${RUN_TESTS++}" ]; then
     cmd ./apptainer/bin/apptainer run docker://sylabsio/lolcow:latest
     hline
     cmd 'curl -fL https://get.docker.com/rootless | sh'
-    # TODO: Run tests with rootless Docker
-    # TODO: Rootless Podman?
 fi
 
 hline
