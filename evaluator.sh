@@ -61,6 +61,9 @@ hline
 cmd cat /etc/sysctl.conf
 
 hline
+cmd cat /etc/sysctl.d/* | grep -v -e "^#" -e '^$' | sort -u
+
+hline
 cmd sysctl user
 
 hline
