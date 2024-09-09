@@ -48,6 +48,12 @@ hline
 cmd 'lscpu | head -13'
 
 hline
+cmd hostnamectl status
+
+hline
+cmd systemd-detect-virt
+
+hline
 cmd 'kconfig | grep -E "USER_NS|NAMESPACES|CGROUP"'
 
 hline
