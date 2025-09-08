@@ -1678,6 +1678,793 @@ EOF
 ```
 </details>
 
+<details>
+<summary> <a href="https://lumi-supercomputer.eu/about-lumi/">LUMI</a> supercomputer</summary>
+
+```
+--------------------------------------------------------------------------------
+Container Evaluator v0.1.0
+Mon 08 Sep 2025 05:35:55 PM EEST
+--------------------------------------------------------------------------------
++ mkdir -p /projappl/project_XXXXXXXXX/container-evaluator-tmp
++ cd /projappl/project_XXXXXXXXX/container-evaluator-tmp
+--------------------------------------------------------------------------------
++ uname -a
+Linux nid002475 5.14.21-150500.55.49_13.0.56-cray_shasta_c #1 SMP Mon Mar 4 14:19:49 UTC 2024 (9d8355b) x86_64 x86_64 x86_64 GNU/Linux
+--------------------------------------------------------------------------------
++ lscpu | head -13
+Architecture:                       x86_64
+CPU op-mode(s):                     32-bit, 64-bit
+Address sizes:                      48 bits physical, 48 bits virtual
+Byte Order:                         Little Endian
+CPU(s):                             256
+On-line CPU(s) list:                0-255
+Vendor ID:                          AuthenticAMD
+Model name:                         AMD EPYC 7763 64-Core Processor
+CPU family:                         25
+Model:                              1
+Thread(s) per core:                 2
+Core(s) per socket:                 64
+Socket(s):                          2
+--------------------------------------------------------------------------------
++ hostnamectl status
+--------------------------------------------------------------------------------
++ systemd-detect-virt
+none
+--------------------------------------------------------------------------------
++ kconfig | grep -E "USER_NS|NAMESPACES|CGROUP"
+CONFIG_CGROUPS=y
+CONFIG_BLK_CGROUP=y
+CONFIG_CGROUP_WRITEBACK=y
+CONFIG_CGROUP_SCHED=y
+CONFIG_CGROUP_PIDS=y
+CONFIG_CGROUP_RDMA=y
+CONFIG_CGROUP_FREEZER=y
+CONFIG_CGROUP_HUGETLB=y
+CONFIG_CGROUP_DEVICE=y
+CONFIG_CGROUP_CPUACCT=y
+CONFIG_CGROUP_PERF=y
+CONFIG_CGROUP_BPF=y
+CONFIG_CGROUP_MISC=y
+# CONFIG_CGROUP_DEBUG is not set
+CONFIG_SOCK_CGROUP_DATA=y
+CONFIG_NAMESPACES=y
+CONFIG_USER_NS=y
+CONFIG_BLK_CGROUP_RWSTAT=y
+CONFIG_BLK_CGROUP_IOLATENCY=y
+CONFIG_BLK_CGROUP_FC_APPID=y
+CONFIG_BLK_CGROUP_IOCOST=y
+CONFIG_BLK_CGROUP_IOPRIO=y
+# CONFIG_BFQ_CGROUP_DEBUG is not set
+CONFIG_NETFILTER_XT_MATCH_CGROUP=m
+CONFIG_NET_CLS_CGROUP=m
+CONFIG_CGROUP_NET_PRIO=y
+CONFIG_CGROUP_NET_CLASSID=y
+--------------------------------------------------------------------------------
++ ls -l /etc/sysctl.conf /etc/sysctl.d
+-rw-r--r-- 1 root root 506 Sep  4  2024 /etc/sysctl.conf
+
+/etc/sysctl.d:
+total 4
+-rw-r--r-- 1 root root 225 Jun 17 13:55 csc-production.conf
+--------------------------------------------------------------------------------
++ cat /etc/sysctl.conf
+####
+#
+# /etc/sysctl.conf is meant for local sysctl settings
+#
+# sysctl reads settings from the following locations:
+#   /boot/sysctl.conf-<kernelversion>
+#   /lib/sysctl.d/*.conf
+#   /usr/lib/sysctl.d/*.conf
+#   /usr/local/lib/sysctl.d/*.conf
+#   /etc/sysctl.d/*.conf
+#   /run/sysctl.d/*.conf
+#   /etc/sysctl.conf
+#
+# To disable or override a distribution provided file just place a
+# file with the same name in /etc/sysctl.d/
+#
+# See sysctl.conf(5), sysctl.d(5) and sysctl(8) for more information
+#
+####
+--------------------------------------------------------------------------------
++ cat /etc/sysctl.d/csc-production.conf
+kernel.perf_event_paranoid=2
+kernel.unprivileged_bpf_disabled=1
+net.core.rmem_max=268435456
+net.core.wmem_max=268435456
+net.ipv4.tcp_rmem=4096 87380 268435456
+net.ipv4.tcp_wmem=4096 65536 268435456
+user.max_user_namespaces=0
+--------------------------------------------------------------------------------
++ sysctl user
+--------------------------------------------------------------------------------
++ sysctl kernel.unprivileged_userns_clone
+--------------------------------------------------------------------------------
++ cat /etc/subuid
++ cat /etc/subgid
+--------------------------------------------------------------------------------
++ ls /dev/kvm
+/dev/kvm
+--------------------------------------------------------------------------------
++ cat /etc/apptainer/apptainer.conf
+--------------------------------------------------------------------------------
++ cat /etc/apptainer/rocmliblist.conf
+--------------------------------------------------------------------------------
++ tail -n +1 /etc/apptainer/network/*
+--------------------------------------------------------------------------------
++ cat /etc/singularity/singularity.conf
+# SINGULARITY.CONF
+# This is the global configuration file for Singularity. This file controls
+# what the container is allowed to do on a particular host, and as a result
+# this file must be owned by root.
+
+# ALLOW SETUID: [BOOL]
+# DEFAULT: yes
+# Should we allow users to utilize the setuid program flow within Singularity?
+# note1: This is the default mode, and to utilize all features, this option
+# must be enabled.  For example, without this option loop mounts of image 
+# files will not work; only sandbox image directories, which do not need loop
+# mounts, will work (subject to note 2).
+# note2: If this option is disabled, it will rely on unprivileged user
+# namespaces which have not been integrated equally between different Linux
+# distributions.
+allow setuid = yes
+
+# OCI MODE: [BOOL]
+# DEFAULT: no
+# Should we use the OCI runtime, and push/pull OCI-SIF images by default?
+# Mimics always specifying --oci on the command line.
+# Can be reversed by specifying --no-oci on the command line.
+# Note that OCI mode requires unprivileged user namespace creation and
+# subuid / subgid mappings.
+oci mode = no
+
+# MAX LOOP DEVICES: [INT]
+# DEFAULT: 256
+# Set the maximum number of loop devices that Singularity should ever attempt
+# to utilize.
+max loop devices = 256
+
+# ALLOW PID NS: [BOOL]
+# DEFAULT: yes
+# Should we allow users to request the PID namespace? Note that for some HPC
+# resources, the PID namespace may confuse the resource manager and break how
+# some MPI implementations utilize shared memory. (note, on some older
+# systems, the PID namespace is always used)
+allow pid ns = yes
+
+# CONFIG PASSWD: [BOOL]
+# DEFAULT: yes
+# If /etc/passwd exists within the container, this will automatically append
+# an entry for the calling user.
+config passwd = yes
+
+# CONFIG GROUP: [BOOL]
+# DEFAULT: yes
+# If /etc/group exists within the container, this will automatically append
+# group entries for the calling user.
+config group = yes
+
+# CONFIG RESOLV_CONF: [BOOL]
+# DEFAULT: yes
+# If there is a bind point within the container, use the host's
+# /etc/resolv.conf.
+config resolv_conf = yes
+
+# MOUNT PROC: [BOOL]
+# DEFAULT: yes
+# Should we automatically bind mount /proc within the container?
+mount proc = yes
+
+# MOUNT SYS: [BOOL]
+# DEFAULT: yes
+# Should we automatically bind mount /sys within the container?
+mount sys = yes
+
+# MOUNT DEV: [yes/no/minimal]
+# DEFAULT: yes
+# Should we automatically bind mount /dev within the container? If 'minimal'
+# is chosen, then only 'null', 'zero', 'random', 'urandom', and 'shm' will
+# be included (the same effect as the --contain options)
+#
+# Must be set to 'yes' or 'minimal' to use --oci mode.
+mount dev = yes
+
+# MOUNT DEVPTS: [BOOL]
+# DEFAULT: yes
+# Should we mount a new instance of devpts if there is a 'minimal'
+# /dev, or -C is passed?  Note, this requires that your kernel was
+# configured with CONFIG_DEVPTS_MULTIPLE_INSTANCES=y, or that you're
+# running kernel 4.7 or newer.
+#
+# Must be set to 'yes' to use --oci mode.
+mount devpts = yes
+
+# MOUNT HOME: [BOOL]
+# DEFAULT: yes
+# Should we automatically determine the calling user's home directory and
+# attempt to mount it's base path into the container? If the --contain option
+# is used, the home directory will be created within the session directory or
+# can be overridden with the SINGULARITY_HOME or SINGULARITY_WORKDIR
+# environment variables (or their corresponding command line options).
+mount home = yes
+
+# MOUNT TMP: [BOOL]
+# DEFAULT: yes
+# Should we automatically bind mount /tmp and /var/tmp into the container? If
+# the --contain option is used, both tmp locations will be created in the
+# session directory or can be specified via the  SINGULARITY_WORKDIR
+# environment variable (or the --workingdir command line option).
+mount tmp = yes
+
+# MOUNT HOSTFS: [BOOL]
+# DEFAULT: no
+# Probe for all mounted file systems that are mounted on the host, and bind
+# those into the container?
+mount hostfs = no
+
+# BIND PATH: [STRING]
+# DEFAULT: Undefined
+# Define a list of files/directories that should be made available from within
+# the container. The file or directory must exist within the container on
+# which to attach to. you can specify a different source and destination
+# path (respectively) with a colon; otherwise source and dest are the same.
+#
+# In native mode, these are ignored if singularity is invoked with --contain except
+# for /etc/hosts and /etc/localtime. When invoked with --contain and --net,
+# /etc/hosts would contain a default generated content for localhost resolution.
+#
+# In OCI mode these are only mounted when --no-compat is specified.
+#bind path = /etc/singularity/default-nsswitch.conf:/etc/nsswitch.conf
+#bind path = /opt
+#bind path = /scratch
+bind path = /etc/localtime
+bind path = /etc/hosts
+
+# USER BIND CONTROL: [BOOL]
+# DEFAULT: yes
+# Allow users to influence and/or define bind points at runtime? This will allow
+# users to specify bind points, scratch and tmp locations. (note: User bind
+# control is only allowed if the host also supports PR_SET_NO_NEW_PRIVS)
+user bind control = yes
+
+# ENABLE FUSEMOUNT: [BOOL]
+# DEFAULT: yes
+# Allow users to mount fuse filesystems inside containers with the --fusemount
+# command line option.
+enable fusemount = yes
+
+# ENABLE OVERLAY: [yes/no/try]
+# DEFAULT: try
+# Enabling this option will make it possible to specify bind paths to locations
+# that do not currently exist within the container.  If 'try' is chosen,
+# overlayfs will be tried but if it is unavailable it will be silently ignored.
+enable overlay = try
+
+# ENABLE UNDERLAY: [yes/no]
+# DEFAULT: yes
+# Enabling this option will make it possible to specify bind paths to locations
+# that do not currently exist within the container even if overlay is not
+# working.  If overlay is available, it will be tried first.
+enable underlay = yes
+
+# TMP SANDBOX: [yes/no]
+# DEFAULT: yes
+# If set to yes, container images will automatically be extracted to a
+# temporary sandbox directory when mounting the image is not supported.
+# If set to no, images will not be extracted to a temporary sandbox
+# in action/instance flows. An explicit build to a sandbox will be required.
+tmp sandbox = yes
+
+# MOUNT SLAVE: [BOOL]
+# DEFAULT: yes
+# Should we automatically propagate file-system changes from the host?
+# This should be set to 'yes' when autofs mounts in the system should
+# show up in the container.
+mount slave = yes
+
+# SESSIONDIR MAXSIZE: [STRING]
+# DEFAULT: 64
+# This specifies how large the default tmpfs sessiondir should be (in MB).
+# The sessiondir is used to hold data written to isolated directories when
+# running with --contain, ephemeral changes when running with --writable-tmpfs.
+# In --oci mode, each tmpfs mount in the container can be up to this size.
+sessiondir max size = 64
+
+# *****************************************************************************
+# WARNING
+#
+# The 'limit container' and 'allow container' directives are not effective if
+# unprivileged user namespaces are enabled. They are only effectively applied
+# when Singularity is running using the native runtime in setuid mode, and
+# unprivileged container execution is not possible on the host.
+#
+# You must disable unprivileged user namespace creation on the host if you rely
+# on the these directives to limit container execution. This will disable OCI
+# mode, which is unprivileged and cannot enforce these limits.
+#
+# See the 'Security' and 'Configuration Files' sections of the Admin Guide for
+# more information.
+# *****************************************************************************
+
+# LIMIT CONTAINER OWNERS: [STRING]
+# DEFAULT: NULL
+# Only allow containers to be used that are owned by a given user. If this
+# configuration is undefined (commented or set to NULL), all containers are
+# allowed to be used. 
+#
+# Only effective in setuid mode, with unprivileged user namespace creation disabled.
+# Ignored for the root user.
+#limit container owners = gmk, singularity, nobody
+
+
+# LIMIT CONTAINER GROUPS: [STRING]
+# DEFAULT: NULL
+# Only allow containers to be used that are owned by a given group. If this
+# configuration is undefined (commented or set to NULL), all containers are
+# allowed to be used.
+#
+# Only effective in setuid mode, with unprivileged user namespace creation disabled.
+# Ignored for the root user.
+#limit container groups = group1, singularity, nobody
+
+
+# LIMIT CONTAINER PATHS: [STRING]
+# DEFAULT: NULL
+# Only allow containers to be used that are located within an allowed path
+# prefix. If this configuration is undefined (commented or set to NULL),
+# containers will be allowed to run from anywhere on the file system.
+#
+# Only effective in setuid mode, with unprivileged user namespace creation disabled.
+# Ignored for the root user.
+#limit container paths = /scratch, /tmp, /global
+
+
+# ALLOW CONTAINER ${TYPE}: [BOOL]
+# DEFAULT: yes
+# This feature limits what kind of containers that Singularity will allow
+# users to use.
+#
+# Only effective in setuid mode, with unprivileged user namespace creation disabled.
+# Ignored for the root user.
+#
+# Allow use of unencrypted SIF containers
+allow container sif = yes
+#
+# Allow use of encrypted SIF containers
+allow container encrypted = yes
+#
+# Allow use of non-SIF image formats
+allow container squashfs = yes
+allow container extfs = yes
+allow container dir = yes
+
+# ALLOW KERNEL SQUASHFS: [BOOL]
+# DEFAULT: yes
+# If set to no, Singularity will not perform any kernel mounts of squashfs filesystems.
+# Instead, for SIF / SquashFS containers, a squashfuse mount will be attempted, with
+# extraction to a temporary sandbox directory if this fails.
+# Applicable to setuid mode only.
+allow kernel squashfs = yes
+
+# ALLOW KERNEL EXTFS: [BOOL]
+# DEFAULT: yes
+# If set to no, Singularity will not perform any kernel mounts of extfs filesystems.
+# This affects both stand-alone image files and filesystems embedded in a SIF file.
+# Applicable to setuid mode only.
+allow kernel extfs = yes
+
+# ALLOW NET USERS: [STRING]
+# DEFAULT: NULL
+# Allow specified root administered CNI network configurations to be used by the
+# specified list of users. By default only root may use CNI configuration,
+# except in the case of a fakeroot execution where only 40_fakeroot.conflist
+# is used. This feature only applies when Singularity is running in
+# SUID mode and the user is non-root.
+#allow net users = gmk, singularity
+
+
+# ALLOW NET GROUPS: [STRING]
+# DEFAULT: NULL
+# Allow specified root administered CNI network configurations to be used by the
+# specified list of users. By default only root may use CNI configuration,
+# except in the case of a fakeroot execution where only 40_fakeroot.conflist
+# is used. This feature only applies when Singularity is running in
+# SUID mode and the user is non-root.
+#allow net groups = group1, singularity
+
+
+# ALLOW NET NETWORKS: [STRING]
+# DEFAULT: NULL
+# Specify the names of CNI network configurations that may be used by users and
+# groups listed in the allow net users / allow net groups directives. Thus feature
+# only applies when Singularity is running in SUID mode and the user is non-root.
+#allow net networks = bridge
+
+
+# ALWAYS USE NV ${TYPE}: [BOOL]
+# DEFAULT: no
+# This feature allows an administrator to determine that every action command
+# should be executed implicitly with the --nv option (useful for GPU only 
+# environments). 
+always use nv = no
+
+# USE NVIDIA-NVIDIA-CONTAINER-CLI ${TYPE}: [BOOL]
+# DEFAULT: no
+# EXPERIMENTAL
+# If set to yes, Singularity will attempt to use nvidia-container-cli to setup
+# GPUs within a container when the --nv flag is enabled.
+# If no (default), the legacy binding of entries in nvbliblist.conf will be performed.
+use nvidia-container-cli = no
+
+# ALWAYS USE ROCM ${TYPE}: [BOOL]
+# DEFAULT: no
+# This feature allows an administrator to determine that every action command
+# should be executed implicitly with the --rocm option (useful for GPU only
+# environments).
+always use rocm = no
+
+# ROOT DEFAULT CAPABILITIES: [full/file/no]
+# DEFAULT: full
+# Define default root capability set kept during runtime.
+# Applies to the singularity runtime only, not --oci mode.
+# - full: keep all capabilities (same as --keep-privs)
+# - file: keep capabilities configured for root in
+#         ${prefix}/etc/singularity/capability.json
+# - no: no capabilities (same as --no-privs)
+root default capabilities = full
+
+# MEMORY FS TYPE: [tmpfs/ramfs]
+# DEFAULT: tmpfs
+# This feature allow to choose temporary filesystem type used by Singularity.
+# Cray CLE 5 and 6 up to CLE 6.0.UP05 there is an issue (kernel panic) when Singularity
+# use tmpfs, so on affected version it's recommended to set this value to ramfs to avoid
+# kernel panic
+memory fs type = tmpfs
+
+# CNI CONFIGURATION PATH: [STRING]
+# DEFAULT: Undefined
+# Defines path from where CNI configuration files are stored
+#cni configuration path =
+
+# CNI PLUGIN PATH: [STRING]
+# DEFAULT: Undefined
+# Defines path from where CNI executable plugins are stored
+#cni plugin path =
+
+
+# CRYPTSETUP PATH: [STRING]
+# DEFAULT: Undefined
+# Path to the cryptsetup executable, used to work with encrypted containers.
+# Must be set to build or run encrypted containers.
+# Executable must be owned by root for security reasons.
+# cryptsetup path =
+cryptsetup path = /usr/sbin/cryptsetup
+
+# GO PATH: [STRING]
+# DEFAULT: Undefined
+# Path to the go executable, used to compile plugins.
+# If not set, SingularityCE will search $PATH, /usr/local/sbin, /usr/local/bin,
+# /usr/sbin, /usr/bin, /sbin, /bin.
+# go path =
+go path = /usr/bin/go
+
+# LDCONFIG PATH: [STRING]
+# DEFAULT: Undefined
+# Path to the ldconfig executable, used to find GPU libraries.
+# Must be set to use --nv / --nvccli.
+# Executable must be owned by root for security reasons.
+# ldconfig path =
+ldconfig path = /sbin/ldconfig
+
+# MKSQUASHFS PATH: [STRING]
+# DEFAULT: Undefined
+# Path to the mksquashfs executable, used to create SIF and SquashFS containers.
+# If not set, SingularityCE will search $PATH, /usr/local/sbin, /usr/local/bin,
+# /usr/sbin, /usr/bin, /sbin, /bin.
+# mksquashfs path =
+
+
+# MKSQUASHFS PROCS: [UINT]
+# DEFAULT: 0 (All CPUs)
+# This allows the administrator to specify the number of CPUs for mksquashfs 
+# to use when building an image.  The fewer processors the longer it takes.
+# To enable it to use all available CPU's set this to 0.
+# mksquashfs procs = 0
+mksquashfs procs = 0
+
+# MKSQUASHFS MEM: [STRING]
+# DEFAULT: Unlimited
+# This allows the administrator to set the maximum amount of memory for mkswapfs
+# to use when building an image.  e.g. 1G for 1gb or 500M for 500mb. Restricting memory
+# can have a major impact on the time it takes mksquashfs to create the image.
+# NOTE: This fuctionality did not exist in squashfs-tools prior to version 4.3
+# If using an earlier version you should not set this.
+# mksquashfs mem = 1G
+
+
+# NVIDIA-CONTAINER-CLI PATH: [STRING]
+# DEFAULT: Undefined
+# Path to the nvidia-container-cli executable, used to find GPU libraries.
+# Must be set to use --nvccli.
+# Executable must be owned by root for security reasons.
+# nvidia-container-cli path =
+
+
+# UNSQUASHFS PATH: [STRING]
+# DEFAULT: Undefined
+# Path to the unsquashfs executable, used to extract SIF and SquashFS containers
+# If not set, SingularityCE will search $PATH, /usr/local/sbin, /usr/local/bin,
+# /usr/sbin, /usr/bin, /sbin, /bin.
+# unsquashfs path =
+
+
+# SHARED LOOP DEVICES: [BOOL]
+# DEFAULT: no
+# Allow to share same images associated with loop devices to minimize loop
+# usage and optimize kernel cache (useful for MPI)
+shared loop devices = no
+
+# DOWNLOAD CONCURRENCY: [UINT]
+# DEFAULT: 3
+# This option specifies how many concurrent streams when downloading (pulling)
+# an image from cloud library.
+download concurrency = 3
+
+# DOWNLOAD PART SIZE: [UINT]
+# DEFAULT: 5242880
+# This option specifies the size of each part when concurrent downloads are
+# enabled.
+download part size = 5242880
+
+# DOWNLOAD BUFFER SIZE: [UINT]
+# DEFAULT: 32768
+# This option specifies the transfer buffer size when concurrent downloads
+# are enabled.
+download buffer size = 32768
+
+# SYSTEMD CGROUPS: [BOOL]
+# DEFAULT: yes
+# Whether to use systemd to manage container cgroups. Required for rootless cgroups
+# functionality. 'no' will manage cgroups directly via cgroupfs.
+systemd cgroups = yes
+
+# SIF FUSE: [BOOL]
+# DEFAULT: no
+# DEPRECATED - FUSE mounts are now used automatically when kernel mounts are disabled / unavailable.
+# Whether to try mounting SIF images with Squashfuse by default.
+# Applies only to unprivileged / user namespace flows. Requires squashfuse and
+# fusermount on PATH. Will fall back to extracting the SIF on failure.
+sif fuse = no
+--------------------------------------------------------------------------------
++ cat /etc/singularity/rocmliblist.conf
+# ROCMLIBLIST.CONF
+# This configuration file determines which ROCm libraries to search for on the
+# host system when the --rocm option is invoked.  You can edit it if you have
+# different libraries on your host system.  You can also add binaries and they
+# will be mounted into the container when the --rocm option is passed.
+
+# put binaries here
+# In shared environments you should ensure that permissions on these files 
+# exclude writing by non-privileged users.  
+rocm-smi
+rocminfo
+
+# put libs here (must end in .so)
+libamd_comgr.so
+libcomgr.so
+libCXLActivityLogger.so
+libelf.so
+libhc_am.so
+libhipblas.so
+libhip_hcc.so
+libhiprand.so
+libhsakmt.so
+libhsa-runtime64.so
+libmcwamp.so
+libmcwamp_cpu.so
+libmcwamp_hsa.so
+libmiopengemm.so
+libMIOpen.so
+libdrm.so
+libdrm_amdgpu.so
+libnuma.so
+libpci.so
+librccl.so
+librocblas.so
+librocfft-device.so
+librocfft.so
+librocrand.so
+librocr_debug_agent64.so
+
+libamdcomgr64.so
+libamdocl64.so
+libcltrace.so
+libOpenCL.so
+ 
+--------------------------------------------------------------------------------
++ tail -n +1 /etc/singularity/network/00_bridge.conflist /etc/singularity/network/10_ptp.conflist /etc/singularity/network/20_ipvlan.conflist /etc/singularity/network/30_macvlan.conflist /etc/singularity/network/40_fakeroot.conflist
+==> /etc/singularity/network/00_bridge.conflist <==
+{
+    "cniVersion": "1.0.0",
+    "name": "bridge",
+    "plugins": [
+        {
+            "type": "bridge",
+            "bridge": "sbr0",
+            "isGateway": true,
+            "ipMasq": true,
+            "ipam": {
+                "type": "host-local",
+                "subnet": "10.22.0.0/16",
+                "routes": [
+                    { "dst": "0.0.0.0/0" }
+                ]
+            }
+        },
+        {
+            "type": "firewall"
+        },
+        {
+            "type": "portmap",
+            "capabilities": {"portMappings": true},
+            "snat": true
+        }
+    ]
+}
+
+==> /etc/singularity/network/10_ptp.conflist <==
+{
+    "cniVersion": "1.0.0",
+    "name": "ptp",
+    "plugins": [
+        {
+            "type": "ptp",
+            "ipMasq": true,
+            "ipam": {
+                "type": "host-local",
+                "subnet": "10.23.0.0/16",
+                "routes": [
+                    { "dst": "0.0.0.0/0" }
+                ]
+            }
+        },
+        {
+            "type": "firewall"
+        },
+        {
+            "type": "portmap",
+            "capabilities": {"portMappings": true},
+            "snat": true
+        }
+    ]
+}
+
+==> /etc/singularity/network/20_ipvlan.conflist <==
+{
+    "cniVersion": "1.0.0",
+    "name": "ipvlan",
+    "plugins": [
+        {
+            "type": "ipvlan",
+            "master": "eth0",
+            "ipam": {
+                "type": "static",
+                "addresses": [
+                    {
+                        "address": "192.168.1.1/24",
+                        "gateway": "192.168.1.254"
+                    }
+                ],
+                "routes": [
+                    { "dst": "0.0.0.0/0" }
+                ]
+            }
+        }
+    ]
+}
+
+==> /etc/singularity/network/30_macvlan.conflist <==
+{
+    "cniVersion": "1.0.0",
+    "name": "macvlan",
+    "plugins": [
+        {
+            "type": "macvlan",
+            "master": "eth0",
+            "ipam": {
+                "type": "static",
+                "addresses": [
+                    {
+                        "address": "192.168.1.1/24",
+                        "gateway": "192.168.1.254"
+                    }
+                ],
+                "routes": [
+                    { "dst": "0.0.0.0/0" }
+                ]
+            }
+        }
+    ]
+}
+
+==> /etc/singularity/network/40_fakeroot.conflist <==
+{
+    "cniVersion": "1.0.0",
+    "name": "fakeroot",
+    "plugins": [
+        {
+            "type": "ptp",
+            "ipMasq": true,
+            "ipam": {
+                "type": "host-local",
+                "subnet": "10.23.0.0/16",
+                "routes": [
+                    { "dst": "0.0.0.0/0" }
+                ]
+            }
+        },
+        {
+            "type": "firewall"
+        },
+        {
+            "type": "portmap",
+            "capabilities": {"portMappings": true},
+            "snat": true
+        }
+    ]
+}
+--------------------------------------------------------------------------------
++ rm -rf apptainer apptainer-tmp
++ curl -fL https://raw.githubusercontent.com/apptainer/apptainer/main/tools/install-unprivileged.sh | bash -s - apptainer
+Extracting https://download.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/a/apptainer-1.4.2-1.el8.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/lzo-2.08-14.el8.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/s/squashfs-tools-4.3-21.el8.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/lz4-libs-1.8.3-5.el8_10.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libzstd-1.4.4-1.el8.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/f/fuse3-libs-3.3.0-19.el8.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libsepol-2.9-3.el8.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/b/bzip2-libs-1.0.6-28.el8_10.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/a/audit-libs-3.1.2-1.el8_10.1.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libcap-ng-0.7.11-1.el8.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libattr-2.4.48-3.el8.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libacl-2.2.53-3.el8.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/p/pcre2-10.32-3.el8_6.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libxcrypt-4.1.1-6.el8.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libselinux-2.9-9.el8_10.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libsemanage-2.9-9.el8_6.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/s/shadow-utils-subid-4.6-22.el8.x86_64.rpm
+Extracting https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libseccomp-2.5.2-1.el8.x86_64.rpm
+Extracting https://download.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/f/fakeroot-libs-1.33-1.el8.x86_64.rpm
+Extracting https://download.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/f/fakeroot-1.33-1.el8.x86_64.rpm
+Patching fakeroot-sysv to make it relocatable
+Creating bin/apptainer and bin/singularity
+Installation complete in apptainer
++ mkdir -p /projappl/project_XXXXXXXXX/container-evaluator-tmp/apptainer-tmp
++ ./apptainer/bin/apptainer run docker://sylabsio/lolcow:latest
+<hang, continuation below is a separate run>
+--------------------------------------------------------------------------------
++ curl -fL https://get.docker.com/rootless | sh
+# Installing stable version 28.4.0
+# Executing docker rootless install script, commit: 5c8855edd778525564500337f5ac4ad65a0c168e
+# Missing system requirements. Please run following commands to
+# install the requirements and run this installer again.
+# Alternatively iptables checks can be disabled with SKIP_IPTABLES=1
+
+cat <<EOF | sudo sh -x
+
+cat <<EOT > /etc/sysctl.d/51-rootless.conf
+user.max_user_namespaces = 28633
+EOT
+sysctl --system
+EOF
+
+--------------------------------------------------------------------------------
+```
+</details>
+
 ## Authors
 
 - Dennis Marttinen ([@twelho](https://github.com/twelho))
